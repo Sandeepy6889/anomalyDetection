@@ -1,0 +1,6 @@
+applications:
+- name: ang-mindapp-sdk
+  host: ang-mindapp-sdk-ctblrdev
+  memory: 128M
+  buildpack: staticfile_buildpack
+  path: dist/ang-mindapp-sdk
