@@ -1,0 +1,6 @@
+applications:
+- name: anomaly-detection
+  host: anomaly-detection-sandeep
+  memory: 128M
+  buildpack: staticfile_buildpack
+  path: dist/anomaly-detection
