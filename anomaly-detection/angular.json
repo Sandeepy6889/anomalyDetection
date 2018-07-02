@@ -23,13 +23,12 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "./styles/dashboard.css",
+              "./anomaly_template/bootstrap/css/bootstrap.min.css",
+              "./anomaly_template/css/1-col-portfolio.css",
               "src/styles.css"
             ],
             "scripts": [
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "./anomaly_template/bootstrap/js/bootstrap.min.js"
             ]
           },
           "configurations": {
