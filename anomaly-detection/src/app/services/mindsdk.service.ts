@@ -65,7 +65,21 @@ export class MindsdkService {
     ];
     console.log('Cookie info', this.cookieService.get('XSRF-TOKEN'));
      return this.http.post(
-      environment.baseUrl + '/api/anomalydetection/v3/models?epsilon=5&minPointsPerCluster=3&_csrf='+this.cookieService.get('XSRF-TOKEN'), {"ioTTimeSeriesItems" :ioTTimeSeriesItems })
+      environment.baseUrl + '/api/anomalydetection/v3/models?epsilon=5&minPointsPerCluster=3&_csrf='+this.cookieService.get('XSRF-TOKEN'), ioTTimeSeriesItems)
       .pipe(map((response: any) => console.log(response)));
   }
+
+  detectAnomaly(){
+    console.log('detect anomaly');
+    var ioTTimeSeriesItems = [
+      {
+        "age": "70",
+        "_time": "2017-10-12T12:00:00.001Z"
+      }];
+    return this.http.post(
+      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID=ed05c9a4-7435-4c1b-a4dc-b229eed42146&_csrf='+this.cookieService.get('XSRF-TOKEN'), ioTTimeSeriesItems)
+      .pipe(map((response: any) => console.log(response)));
+  }
+  
+
 }

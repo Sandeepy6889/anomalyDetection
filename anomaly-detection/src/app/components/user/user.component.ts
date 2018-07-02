@@ -33,7 +33,14 @@ export class UserComponent implements OnInit {
     this.mindsdkservice.trainModel().subscribe(response => {
       console.log(response);
     });
+  }
 
+  detectAnomaly(){
+    console.log('Hitting detect Anomaly API');
+    this.mindsdkservice.detectAnomaly().subscribe(response => {
+      console.log(response);
+      console.log("Anomaly detection completed");
+    });
   }
 
 }
