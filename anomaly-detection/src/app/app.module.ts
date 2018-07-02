@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -16,7 +17,7 @@ import { MindsdkService } from './services/mindsdk.service';
     BrowserModule,
     HttpClientModule
   ],
-  providers: [MindsdkService],
+  providers: [MindsdkService, CookieService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
