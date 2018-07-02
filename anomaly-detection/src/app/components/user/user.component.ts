@@ -28,4 +28,12 @@ export class UserComponent implements OnInit {
 
   }
 
+  trainModel() {
+    console.log('getting assets from service...');
+    this.mindsdkservice.trainModel().subscribe(response => {
+      console.log(response);
+    });
+
+  }
+
 }
