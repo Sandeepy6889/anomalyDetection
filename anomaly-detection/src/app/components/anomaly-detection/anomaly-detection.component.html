@@ -29,11 +29,11 @@
         <form class="form-horizontal">
           <div class="form-group">
             <label for="exampleInputEmail1">Start time</label>
-            <input type="datetime-local" class="form-control" id="exampleInputEmail1" placeholder="Email">
+            <input type="datetime-local" [(ngModel)]="assetStDt" class="form-control" name="assetStDt">
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">End time</label>
-            <input type="datetime-local" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            <input type="datetime-local" [(ngModel)]="assetEndDt" class="form-control" name="assetEndDt">
           </div>
           <div class="form-group">
               <button type="button" (click)="getAssetData()" class="btn btn-primary ">Fetch Data</button>
@@ -61,14 +61,14 @@
           <form class="form-horizontal">
               <div class="form-group">
                 <label for="exampleInputEmail1">Start time</label>
-                <input type="datetime-local" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                <input type="datetime-local" [(ngModel)]="anomalyStDt" class="form-control" name="anomalyStDt">
               </div>
               <div class="form-group">
                 <label for="exampleInputPassword1">End time</label>
-                <input type="datetime-local" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                <input type="datetime-local" [(ngModel)]="anomalyEndDt" class="form-control" name="anomalyEndDt">
               </div>
               <div class="form-group">
-                  <button type="button" (click)="detectAnomaly()" class="btn btn-primary ">Start</button>
+                  <button type="button" (click)="detectAnomaly()" class="btn btn-primary ">Detect</button>
                 </div>
             </form>
       </div>
@@ -87,7 +87,7 @@
   <!-- /.container -->
   
   <!-- Footer -->
-  <footer class="py-5 bg-dark">
+  <footer class="py-1 bg-dark">
     <div class="container">
       <p class="m-0 text-center text-white">Copyright &copy; Your Website 2018</p>
     </div>
