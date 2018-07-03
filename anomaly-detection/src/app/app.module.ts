@@ -9,17 +9,18 @@ import { MindsdkService } from './services/mindsdk.service';
 import { AnomalyDetectionComponent } from './components/anomaly-detection/anomaly-detection.component';
 import { AssetService } from './services/asset.service';
 import { AnomalyService } from './services/anomaly.service';
-
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
     UserComponent,
-    AnomalyDetectionComponent
+    AnomalyDetectionComponent 
   ],
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule     
   ],
   providers: [MindsdkService, CookieService, AssetService, AnomalyService ],
   bootstrap: [AppComponent]

@@ -43,7 +43,7 @@ export class AnomalyDetectionComponent implements OnInit {
 
   trainModel() {
     console.log('Model training...', this.assetData);
-    this._assetService.getAssetData(this.assetStDt, this.assetEndDt).subscribe(response => {
+    this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(response => {
       this.assetData = response;
       this.anomalyService.trainModel(this.assetData).subscribe(response => {
         console.log(response);
