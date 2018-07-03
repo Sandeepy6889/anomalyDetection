@@ -53,10 +53,17 @@ export class AnomalyDetectionComponent implements OnInit {
 
   detectAnomaly(){
     console.log('Hitting detect Anomaly API');
-    this.anomalyService.detectAnomaly().subscribe(response => {
-      console.log(response);
-      console.log("Anomaly detection completed");
+
+    this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(response => {
+      this.assetData = response;
+      console.log("Data for Anomaly",this.assetData);
+      this.anomalyService.detectAnomaly(this.assetData).subscribe(response => {
+        console.log(response);
+        console.log("Anomaly detection completed");
+      });
     });
+    
+    
   }
   
 

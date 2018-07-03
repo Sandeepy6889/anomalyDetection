@@ -62,7 +62,7 @@ export class AnomalyService {
       .pipe(map((response: any) => console.log(response))); 
   }
 
-  detectAnomaly(){
+  detectAnomaly(assetData){
     console.log('detect anomaly called');
     
     var ioTTimeSeriesItems = [
@@ -71,7 +71,7 @@ export class AnomalyService {
         "_time": "2017-10-12T12:00:00.001Z"
       }];
     return this.http.post(
-      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID=ed05c9a4-7435-4c1b-a4dc-b229eed42146&_csrf='+this.cookieService.get('XSRF-TOKEN'), ioTTimeSeriesItems)
+      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID=4ceefed0-a7a0-498f-85bb-17ebfe5d249b&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
       .pipe(map((response: any) => console.log(response))); 
   }
 
