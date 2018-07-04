@@ -15,7 +15,7 @@ export class AnomalyDetectionComponent implements OnInit {
   public assetEndDt = "";
   public anomalyStDt = "";
   public anomalyEndDt = "";
-
+  modelId="";
 
   constructor(private _assetService:AssetService, private anomalyService:AnomalyService) { }
 
@@ -47,6 +47,7 @@ export class AnomalyDetectionComponent implements OnInit {
       this.assetData = response;
       this.anomalyService.trainModel(this.assetData).subscribe(response => {
         console.log(response);
+        this.modelId=response.id;
       });
     });
   }
@@ -57,7 +58,7 @@ export class AnomalyDetectionComponent implements OnInit {
     this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(response => {
       this.assetData = response;
       console.log("Data for Anomaly",this.assetData);
-      this.anomalyService.detectAnomaly(this.assetData).subscribe(response => {
+      this.anomalyService.detectAnomaly(this.assetData,this.modelId).subscribe(response => {
         console.log(response);
         console.log("Anomaly detection completed");
       });

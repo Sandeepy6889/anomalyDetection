@@ -12,7 +12,7 @@ export class AnomalyService {
   constructor(private http: HttpClient,private cookieService: CookieService) { }
 
   trainModel(assetData) {
-    console.log('model training called');
+    console.log('model training called'+ assetData);
     console.log('baseUrl: ' + environment.baseUrl);
     var ioTTimeSeriesItems = [
       {
@@ -59,11 +59,11 @@ export class AnomalyService {
     console.log('Cookie info', this.cookieService.get('XSRF-TOKEN'));
      return this.http.post(
       environment.baseUrl + '/api/anomalydetection/v3/models?epsilon=5&minPointsPerCluster=3&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
-      .pipe(map((response: any) => console.log(response))); 
+      .pipe(map((response: any) => {return response;})); 
   }
 
-  detectAnomaly(assetData){
-    console.log('detect anomaly called');
+  detectAnomaly(assetData,modelId){
+    console.log('detect anomaly called modelId: ',modelId);
     
     var ioTTimeSeriesItems = [
       {
@@ -71,7 +71,7 @@ export class AnomalyService {
         "_time": "2017-10-12T12:00:00.001Z"
       }];
     return this.http.post(
-      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID=4ceefed0-a7a0-498f-85bb-17ebfe5d249b&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
+      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID='+modelId+'&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
       .pipe(map((response: any) => console.log(response))); 
   }
 
