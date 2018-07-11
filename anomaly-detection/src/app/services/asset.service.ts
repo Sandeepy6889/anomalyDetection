@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AssetService {
+
   private queryString ="";
 
   constructor(private http: HttpClient) { }
@@ -18,5 +19,11 @@ export class AssetService {
     return this.http.get(
       environment.baseUrl + '/api/iottimeseries/v3/timeseries/3cc1e87c3d794e3caf5d018f06646fbd/power?'+this.queryString)
       .pipe(map((response: any) => response)); 
+     }
+
+     getAssetInfo(){
+      return this.http.get(
+        environment.baseUrl + '/api/assetmanagement/v3/assets/3cc1e87c3d794e3caf5d018f06646fbd')
+        .pipe(map((response: any) => response)); 
      }
 }

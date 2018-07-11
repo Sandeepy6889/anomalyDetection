@@ -15,23 +15,20 @@ export class AnomalyDetectionComponent implements OnInit {
   public assetEndDt = "";
   public anomalyStDt = "";
   public anomalyEndDt = "";
+  public name;
   modelId="";
 
   constructor(private _assetService:AssetService, private anomalyService:AnomalyService) { }
 
   ngOnInit() {
+    this.getAssetName();
   }
 
-  dateFormat(date){
-
-    console.log("Time Zone", new Date(date).getTimezoneOffset());
-    var datePipe = new DatePipe("en_US");
-    var strDate = datePipe.transform(date, 'yyyy-MM-ddThh:mm:ss.SSS')+"Z"
-    console.log('Asset Date', strDate);
-    return strDate;
-
-  
-    // 2018-05-01T06:15:47.745Z
+  getAssetName(){
+    this._assetService.getAssetInfo().subscribe(response => {
+      this.name = response.name;
+      console.log('Asset Details ',response);
+    }); 
   }
 
   getAssetData() {
@@ -63,9 +60,14 @@ export class AnomalyDetectionComponent implements OnInit {
         console.log("Anomaly detection completed");
       });
     });
-    
-    
   }
-  
 
+  dateFormat(date){
+
+    console.log("Time Zone", new Date(date).getTimezoneOffset());
+    var datePipe = new DatePipe("en_US");
+    var strDate = datePipe.transform(date, 'yyyy-MM-ddThh:mm:ss.SSS')+"Z"
+    console.log('Asset Date', strDate);
+    return strDate;
+  }
 }

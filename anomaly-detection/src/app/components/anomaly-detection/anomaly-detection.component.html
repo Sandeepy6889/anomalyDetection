@@ -2,26 +2,16 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
       <a class="navbar-brand" href="#">Anomaly detection</a>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          
-        </ul>
-      </div>
     </div>
   </nav>
   
   <!-- Page Content -->
-  <div class="container">
+  <div class="container siemens-margin-top">
   
+    <h5 class="my-1 siemens-text-color">Asset Details : {{name}}</h5>
+    <hr>
     <!-- Page Heading -->
-    <h1 class="my-1">Create and train model
-  
-    </h1>
+    <h5 class="my-1 siemens-text-color">Training </h5>
   
     <!-- Project One -->
     <div class="row">
@@ -36,7 +26,7 @@
             <input type="datetime-local" [(ngModel)]="assetEndDt" class="form-control" name="assetEndDt">
           </div>
           <div class="form-group">
-              <button type="button" (click)="trainModel()" class="btn btn-primary ml-1">Train Model</button>
+              <button type="button" (click)="trainModel()" class="btn btn-info ml-1">Train</button>
             </div>
         </form>
         
@@ -51,8 +41,8 @@
     <!-- /.row -->
   
     <hr>
-    <h1 class="my-1">Anomaly detection
-    </h1>
+    <h5 class="my-1 siemens-text-color">Anomaly detection
+    </h5>
   
     <!-- Project Two -->
     <div class="row">
@@ -67,7 +57,7 @@
                 <input type="datetime-local" [(ngModel)]="anomalyEndDt" class="form-control" name="anomalyEndDt">
               </div>
               <div class="form-group">
-                  <button type="button" (click)="detectAnomaly()" class="btn btn-primary ">Detect</button>
+                  <button type="button" (click)="detectAnomaly()" class="btn btn-info ">Detect</button>
                 </div>
             </form>
       </div>
@@ -88,7 +78,7 @@
   <!-- Footer -->
   <footer class="py-1 bg-dark">
     <div class="container">
-      <p class="m-0 text-center text-white">Copyright &copy; Your Website 2018</p>
+      <p class="m-0 text-center text-white">Copyright &copy; Siemens 2018</p>
     </div>
     <!-- /.container -->
   </footer>
