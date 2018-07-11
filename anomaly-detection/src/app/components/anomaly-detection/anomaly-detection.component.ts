@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AssetService } from '../../services/asset.service';
 import { AnomalyService } from '../../services/anomaly.service';
 import { DatePipe } from '@angular/common';
+import {Chart} from 'chart.js';
 
 @Component({
   selector: 'app-anomaly-detection',
@@ -17,11 +18,17 @@ export class AnomalyDetectionComponent implements OnInit {
   public anomalyEndDt = "";
   public name;
   modelId="";
+  chart=[];
+  trained_voltage_data=[100,21,44,47,15,19,22,94,98,1,5,9,13,16,20,81,85,89];
+  trained_current_data=[32,57,54,86,82,79,7,3,100,6,2,88,85,81,20,16,12,8];
+
 
   constructor(private _assetService:AssetService, private anomalyService:AnomalyService) { }
 
   ngOnInit() {
     this.getAssetName();
+    this.plotGraph('canvas');
+    this.plotGraph('canvas2');    
   }
 
   getAssetName(){
@@ -46,6 +53,40 @@ export class AnomalyDetectionComponent implements OnInit {
         console.log(response);
         this.modelId=response.id;
       });
+    });
+  }
+
+  plotGraph(divId: string){
+    this.chart = new Chart(divId, {
+      type: 'line',
+      data: {
+        labels: [1,2,3,4],
+        datasets: [
+          { 
+            data: this.trained_voltage_data,
+            borderColor: "#3cba9f",
+            fill: false
+          },
+          { 
+            data: this.trained_current_data,
+            borderColor: "#ffcc00",
+            fill: false
+          },
+        ]
+      },
+      options: {
+        legend: {
+          display: false
+        },
+        scales: {
+          xAxes: [{
+            display: true
+          }],
+          yAxes: [{
+            display: true
+          }],
+        }
+      }
     });
   }
 
