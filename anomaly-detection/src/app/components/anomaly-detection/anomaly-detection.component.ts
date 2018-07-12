@@ -4,6 +4,7 @@ import { AnomalyService } from '../../services/anomaly.service';
 import { DatePipe } from '@angular/common';
 import {Chart} from 'chart.js';
 import { HttpResponse } from '@angular/common/http';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-anomaly-detection',
@@ -24,14 +25,16 @@ export class AnomalyDetectionComponent implements OnInit {
   private trained_voltage_data=[];
   private trained_current_data=[];
   private _time = [];
+  private dataLabels = [];
 
 
   constructor(private _assetService:AssetService, private anomalyService:AnomalyService) { }
 
   ngOnInit() {
-    this.getAssetName();
-    this.plotGraph('canvas');
-    this.plotGraph('canvas2');    
+
+    // this.getAssetName();
+    // this.plotGraph('canvas');
+    // this.plotGraph('canvas2');    
   }
 
   getAssetName(){
@@ -66,8 +69,12 @@ export class AnomalyDetectionComponent implements OnInit {
     for (let index = 0; index < assetData.length; index++) {
       this.trained_voltage_data.push(assetData[index].Voltage);
       this.trained_current_data.push(assetData[index].Current);
-      this._time.push(assetData[index]._time);
+      this._time.push(this.parseJsonDate(assetData[index]._time));
     }
+  }
+  
+  parseJsonDate(date) {
+    return moment(date).format('d');
   }
 
   plotGraph(divId: string){
@@ -95,20 +102,8 @@ export class AnomalyDetectionComponent implements OnInit {
         },
         scales: {
           xAxes: [{
-            display: true,
-            ticks: {
-              callback: function(dataLabel, index) {
-								// Hide the label of every 2nd dataset. return null to hide the grid line too
-                // console.log("datalabel: ",dataLabel);
-               
-                return this.parseJsonDate(dataLabel);
-							}
-              // stepSize: 2,
-            //   minRotation: 90,
-            //   autoSkip: true,
-            //  maxTicksLimit: 5
-          }
-          }],
+            display: true
+         }],
           yAxes: [{
             display: true
           }],
@@ -134,25 +129,4 @@ export class AnomalyDetectionComponent implements OnInit {
     console.log('Asset Date', strDate);
     return strDate;
   }
-
-  parseJsonDate(date: string): string {
-    let dateObj = new Date(date);
-    var month = new Array();
-    month[0] = "January";
-    month[1] = "February";
-    month[2] = "March";
-    month[3] = "April";
-    month[4] = "May";
-    month[5] = "June";
-    month[6] = "July";
-    month[7] = "August";
-    month[8] = "September";
-    month[9] = "October";
-    month[10] = "November";
-    month[11] = "December";
-    console.log(dateObj);
-    return dateObj.getDate().toString() +" "+ month[dateObj.getMonth()];
-
-  }
-
 }
