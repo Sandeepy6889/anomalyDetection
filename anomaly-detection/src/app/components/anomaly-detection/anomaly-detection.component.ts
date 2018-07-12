@@ -20,19 +20,19 @@ export class AnomalyDetectionComponent implements OnInit {
   public anomalyEndDt = "";
   public name;
   private modelId="";
-  private chart=[];
-
+  public trained_chart;
+  public anomaly_chart;
   private trained_voltage_data=[];
   private trained_current_data=[];
   private _time = [];
-  private dataLabels = [];
+  
 
 
   constructor(private _assetService:AssetService, private anomalyService:AnomalyService) { }
 
   ngOnInit() {
 
-    // this.getAssetName();
+     this.getAssetName();
     // this.plotGraph('canvas');
     // this.plotGraph('canvas2');    
   }
@@ -54,12 +54,13 @@ export class AnomalyDetectionComponent implements OnInit {
   trainModel() {
     this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(response => {
       this.assetData = response;
+      this.parseJsonData(this.assetData);
+      this.plotGraph('canvas',"training");
       this.anomalyService.trainModel(this.assetData).subscribe(response => {
         this.modelId=response.id;
       });
     });
-    this.parseJsonData(this.assetData);
-    this.plotGraph('canvas');
+    
   }
 
   parseJsonData(assetData){
@@ -69,28 +70,35 @@ export class AnomalyDetectionComponent implements OnInit {
     for (let index = 0; index < assetData.length; index++) {
       this.trained_voltage_data.push(assetData[index].Voltage);
       this.trained_current_data.push(assetData[index].Current);
-      this._time.push(this.parseJsonDate(assetData[index]._time));
+      this._time.push(assetData[index]._time);
     }
   }
   
   parseJsonDate(date) {
-    return moment(date).format('d');
+    // 'MM-DD-YYYY hh:mm:ss'
+    return moment(date).format();
   }
 
-  plotGraph(divId: string){
-    this.chart = [];
-    this.chart = new Chart(divId, {
+  plotGraph(divId: string,chartName : string){
+   
+    let info = {
       type: 'line',
       data: {
         labels: this._time,
         datasets: [
           { 
+            label: 'Voltage',
             data: this.trained_voltage_data,
+            borderWidth: 2,
+            pointRadius: 2,
             borderColor: "#3cba9f",
             fill: false
           },
           { 
+            label: 'Current',
             data: this.trained_current_data,
+            borderWidth: 2,
+            pointRadius: 2,
             borderColor: "#ffcc00",
             fill: false
           },
@@ -98,24 +106,48 @@ export class AnomalyDetectionComponent implements OnInit {
       },
       options: {
         legend: {
-          display: false
+          display: true
         },
         scales: {
           xAxes: [{
-            display: true
+            type: 'time',
+            display: true,
+            scaleLabel: {
+							display: true,
+							labelString: 'Date/Time'
+						}
          }],
           yAxes: [{
-            display: true
+            display: true,
+            scaleLabel: {
+							display: true,
+							labelString: 'Voltage/Current'
+						}
           }],
-        }
+        },
+        
       }
-    });
+    };
+    if(chartName === "training")
+    {
+      if(this.trained_chart)
+        this.trained_chart.destroy();
+        this.trained_chart = new Chart(divId, info);
+    }
+    else
+    {
+      if(this.anomaly_chart)
+      this.anomaly_chart.destroy();
+      this.anomaly_chart = new Chart(divId, info);
+    }
   }
 
   detectAnomaly(){
    this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(response => {
       this.assetData = response;
       console.log("Data for Anomaly",this.assetData);
+      this.parseJsonData(this.assetData);
+      this.plotGraph('canvas2',"anamoly");
       this.anomalyService.detectAnomaly(this.assetData,this.modelId).subscribe(response => {
         console.log(response);
         console.log("Anomaly detection completed");
