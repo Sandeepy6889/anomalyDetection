@@ -19,9 +19,8 @@ export class AnomalyDetectionComponent implements OnInit {
   public anomalyEndDt = "";
   public name;
   private modelId="";
-  chart=[];
-  //private trained_voltage_data=[100,21,44,47,15,19,22,94,98,1,5,9,13,16,20,81,85,89];
- // private trained_current_data=[32,57,54,86,82,79,7,3,100,6,2,88,85,81,20,16,12,8];
+  private chart=[];
+
   private trained_voltage_data=[];
   private trained_current_data=[];
   private _time = [];
@@ -53,11 +52,11 @@ export class AnomalyDetectionComponent implements OnInit {
     this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(response => {
       this.assetData = response;
       this.anomalyService.trainModel(this.assetData).subscribe(response => {
-        this.parseJsonData(this.assetData);
-        this.plotGraph('canvas');
         this.modelId=response.id;
       });
     });
+    this.parseJsonData(this.assetData);
+    this.plotGraph('canvas');
   }
 
   parseJsonData(assetData){
@@ -72,6 +71,7 @@ export class AnomalyDetectionComponent implements OnInit {
   }
 
   plotGraph(divId: string){
+    this.chart = [];
     this.chart = new Chart(divId, {
       type: 'line',
       data: {
@@ -95,7 +95,19 @@ export class AnomalyDetectionComponent implements OnInit {
         },
         scales: {
           xAxes: [{
-            display: true
+            display: true,
+            ticks: {
+              callback: function(dataLabel, index) {
+								// Hide the label of every 2nd dataset. return null to hide the grid line too
+                // console.log("datalabel: ",dataLabel);
+               
+                return this.parseJsonDate(dataLabel);
+							}
+              // stepSize: 2,
+            //   minRotation: 90,
+            //   autoSkip: true,
+            //  maxTicksLimit: 5
+          }
           }],
           yAxes: [{
             display: true
@@ -122,4 +134,25 @@ export class AnomalyDetectionComponent implements OnInit {
     console.log('Asset Date', strDate);
     return strDate;
   }
+
+  parseJsonDate(date: string): string {
+    let dateObj = new Date(date);
+    var month = new Array();
+    month[0] = "January";
+    month[1] = "February";
+    month[2] = "March";
+    month[3] = "April";
+    month[4] = "May";
+    month[5] = "June";
+    month[6] = "July";
+    month[7] = "August";
+    month[8] = "September";
+    month[9] = "October";
+    month[10] = "November";
+    month[11] = "December";
+    console.log(dateObj);
+    return dateObj.getDate().toString() +" "+ month[dateObj.getMonth()];
+
+  }
+
 }
