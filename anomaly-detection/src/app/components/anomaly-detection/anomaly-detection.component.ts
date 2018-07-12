@@ -31,10 +31,9 @@ export class AnomalyDetectionComponent implements OnInit {
   constructor(private _assetService:AssetService, private anomalyService:AnomalyService) { }
 
   ngOnInit() {
-
      this.getAssetName();
-    // this.plotGraph('canvas');
-    // this.plotGraph('canvas2');    
+     this.plotGraph('canvas',"training");
+     this.plotGraph('canvas2',"anomaly");
   }
 
   getAssetName(){
@@ -54,6 +53,7 @@ export class AnomalyDetectionComponent implements OnInit {
   trainModel() {
     this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(response => {
       this.assetData = response;
+      
       this.parseJsonData(this.assetData);
       this.plotGraph('canvas',"training");
       this.anomalyService.trainModel(this.assetData).subscribe(response => {
@@ -89,17 +89,17 @@ export class AnomalyDetectionComponent implements OnInit {
           { 
             label: 'Voltage',
             data: this.trained_voltage_data,
-            borderWidth: 2,
-            pointRadius: 2,
-            borderColor: "#3cba9f",
+            borderWidth: 1,
+            pointRadius: 1,
+            borderColor: "#20B2AA",
             fill: false
           },
           { 
             label: 'Current',
             data: this.trained_current_data,
-            borderWidth: 2,
-            pointRadius: 2,
-            borderColor: "#ffcc00",
+            borderWidth: 1,
+            pointRadius: 1,
+            borderColor: "#b38697",
             fill: false
           },
         ]
@@ -145,7 +145,6 @@ export class AnomalyDetectionComponent implements OnInit {
   detectAnomaly(){
    this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(response => {
       this.assetData = response;
-      console.log("Data for Anomaly",this.assetData);
       this.parseJsonData(this.assetData);
       this.plotGraph('canvas2',"anamoly");
       this.anomalyService.detectAnomaly(this.assetData,this.modelId).subscribe(response => {
