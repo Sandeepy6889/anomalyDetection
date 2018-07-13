@@ -12,7 +12,6 @@ export class AnomalyService {
   constructor(private http: HttpClient,private cookieService: CookieService) { }
 
   trainModel(assetData) {
-    console.log('Cookie info', this.cookieService.get('XSRF-TOKEN'));
      return this.http.post(
       environment.baseUrl + '/api/anomalydetection/v3/models?epsilon=5&minPointsPerCluster=3&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
       .pipe(map((response: any) => {return response;})); 
