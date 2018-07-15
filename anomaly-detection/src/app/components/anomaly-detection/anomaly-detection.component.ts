@@ -12,8 +12,6 @@ import * as moment from 'moment';
   styleUrls: ['./anomaly-detection.component.css']
 })
 export class AnomalyDetectionComponent implements OnInit {
-
-
   public assetStDt = "";
   public assetEndDt = "";
   public anomalyStDt = "";
@@ -29,80 +27,83 @@ export class AnomalyDetectionComponent implements OnInit {
   public trainingMessage = "";
   public anomalyAlertType = "";
   public anomalyMessage = "";
-
+  public minPointsPrCluster;
+  public epsilon;
+  private voltageBackgroundColor = [];
+  private currentBackgroundColor = [];
+  private pointRadius = [];
 
   constructor(private _assetService: AssetService, private anomalyService: AnomalyService) { }
 
-  clearTrainingMessages() {
-    this.trainingAlertType = "";
-    this.trainingMessage = "";
-  }
-
-  clearAnomalyMessages() {
-    this.anomalyAlertType = "";
-    this.anomalyMessage = "";
-  }
-
   ngOnInit() {
-    this.getAssetName();
+    // this.setAssetName();
     this.plotGraph('training-canvas', "training");
     this.plotGraph('anomaly-canvas', "anomaly");
   }
 
-  getAssetName() {
+  setAssetName() {
     this._assetService.getAssetInfo().subscribe(response => {
       this.name = response.name;
-      console.log('Asset Details ', response);
     });
   }
 
   trainModel() {
     this.clearTrainingMessages();
     this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(assetData => {
-      this.parseJsonData(assetData);
-      this.plotGraph('training-canvas', "training");
-      if (assetData.length === 0) {
+      if (assetData.length > 0) {
+        this.anomalyService.trainModel(assetData, this.epsilon, this.minPointsPrCluster).subscribe(response => {
+          this.modelId = response.id;
+          this.trainingMessage = "Model trained successfully";
+          this.trainingAlertType = "alert alert-success";
+        });
+      }
+      else {
         this.trainingMessage = "No data available for given duration";
         this.trainingAlertType = "alert alert-danger";
-        return;
       }
-      this.anomalyService.trainModel(assetData).subscribe(response => {
-        this.modelId = response.id;
-        this.trainingMessage = "Model trained successfully";
-        this.trainingAlertType = "alert alert-success";
-      });
+      this.clearChartAttributes();
+      for (let index = 0; index < assetData.length; index++) {
+        this.trained_voltage_data.push(assetData[index].Voltage);
+        this.trained_current_data.push(assetData[index].Current);
+        this._time.push(assetData[index]._time);
+        this.voltageBackgroundColor.push('#20B2AA');
+        this.currentBackgroundColor.push('#78866b');
+        this.pointRadius.push(1.5);
+      }
+      this.plotGraph('training-canvas', "training");
     });
-
-    // this.parseJsonData(this.getData());
-    // this.plotGraph('training-canvas',"training");
-    // this.msgType = "alert alert-danger";
-  }
-
-  parseJsonData(assetData) {
-    this.trained_voltage_data = [];
-    this.trained_current_data = [];
-    this._time = [];
-    for (let index = 0; index < assetData.length; index++) {
-      this.trained_voltage_data.push(assetData[index].Voltage);
-      this.trained_current_data.push(assetData[index].Current);
-      this._time.push(assetData[index]._time);
-    }
   }
 
   detectAnomaly() {
     this.clearAnomalyMessages();
     this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(assetData => {
-      this.parseJsonData(assetData);
-      this.plotGraph('anomaly-canvas', "anomaly");
-      if (assetData.length === 0) {
+      if (assetData.length > 0) {
+        this.anomalyService.detectAnomaly(assetData, this.modelId).subscribe(anomalyData => {
+          this.clearChartAttributes();
+          let anomalyIndex = 0;
+          for (let index = 0; index < assetData.length; index++) {
+            this.trained_voltage_data.push(assetData[index].Voltage);
+            this.trained_current_data.push(assetData[index].Current);
+            this._time.push(assetData[index]._time);
+             if (anomalyData.length > anomalyIndex && assetData[index]._time === anomalyData[anomalyIndex]._time) {
+              this.voltageBackgroundColor.push("red");
+              this.currentBackgroundColor.push("red");
+              this.pointRadius.push(4);
+              console.log('anomalyIndex ', anomalyIndex);
+              anomalyIndex = anomalyIndex + 1;       
+            }
+            else {
+              this.voltageBackgroundColor.push('#20B2AA');
+              this.currentBackgroundColor.push('#78866b');
+              this.pointRadius.push(1.5);
+            }
+          }
+          this.plotGraph('anomaly-canvas', "anomaly");
+        });
+      } else {
         this.anomalyMessage = "No data available for given duration";
         this.anomalyAlertType = "alert alert-danger";
-        return;
       }
-      this.anomalyService.detectAnomaly(assetData, this.modelId).subscribe(response => {
-        console.log(response);
-        console.log("Anomaly detection completed");
-      });
     });
   }
 
@@ -118,8 +119,7 @@ export class AnomalyDetectionComponent implements OnInit {
     return moment(date).format();
   }
 
-  plotGraph(divId: string, chartName: string) {
-
+  plotGraph(chartID: string, chartName: string) {
     let info = {
       type: 'line',
       data: {
@@ -129,17 +129,19 @@ export class AnomalyDetectionComponent implements OnInit {
             label: 'Voltage',
             backgroundColor: "#20B2AA",
             data: this.trained_voltage_data,
+            pointBackgroundColor: this.voltageBackgroundColor,
             borderWidth: 1.5,
-            pointRadius: 1.5,
+            pointRadius: this.pointRadius,
             borderColor: "#20B2AA",
             fill: false
           },
           {
             label: 'Current',
-            backgroundColor: "#b38697",
+            backgroundColor: "#78866b",
             data: this.trained_current_data,
+            pointBackgroundColor: this.currentBackgroundColor,
             borderWidth: 1.5,
-            pointRadius: 1.5,
+            pointRadius: this.pointRadius,
             borderColor: "#78866b",
             fill: false
           },
@@ -177,13 +179,32 @@ export class AnomalyDetectionComponent implements OnInit {
     if (chartName === "training") {
       if (this.trained_chart)
         this.trained_chart.destroy();
-      this.trained_chart = new Chart(divId, info);
+      this.trained_chart = new Chart(chartID, info);
     }
     else {
       if (this.anomaly_chart)
         this.anomaly_chart.destroy();
-      this.anomaly_chart = new Chart(divId, info);
+      this.anomaly_chart = new Chart(chartID, info);
     }
+  }
+
+  clearTrainingMessages() {
+    this.trainingAlertType = "";
+    this.trainingMessage = "";
+  }
+
+  clearAnomalyMessages() {
+    this.anomalyAlertType = "";
+    this.anomalyMessage = "";
+  }
+
+  clearChartAttributes() {
+    this.trained_voltage_data = [];
+    this.trained_current_data = [];
+    this._time = [];
+    this.voltageBackgroundColor = [];
+    this.currentBackgroundColor = [];
+    this.pointRadius = [];
   }
 
   getData() {
@@ -256,6 +277,7 @@ export class AnomalyDetectionComponent implements OnInit {
       { Voltage: 12, Current: 89, _time: "2018-05-07T18:04:52.240Z" },
       { Voltage: 16, Current: 85, _time: "2018-05-07T18:04:56.159Z" }
     ];
+
     return jsonData;
   }
 }

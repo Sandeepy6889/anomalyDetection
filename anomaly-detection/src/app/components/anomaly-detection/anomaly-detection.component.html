@@ -1,86 +1,93 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="#">Anomaly detection</a>
-    </div>
-  </nav>
-  
-  <!-- Page Content -->
-  <div class="container siemens-margin-top">
-  
-    <h5 class="my-1 siemens-text-color">Asset Details : {{name}}</h5>
-    <hr>
-    <!-- Page Heading -->
-    <h5 class="my-1 siemens-text-color">Training </h5>
-  
-    <!-- Project One -->
-    <div class="row">
-      <div class="col-md-5">
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label for="exampleInputEmail1">Start time</label>
-            <input type="datetime-local" [(ngModel)]="assetStDt" class="form-control" name="assetStDt">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputPassword1">End time</label>
-            <input type="datetime-local" [(ngModel)]="assetEndDt" class="form-control" name="assetEndDt">
-          </div>
-          <div class="form-group">
-              <button type="button" (click)="trainModel()" class="btn btn-info ml-1">Train Model</button>
-          </div>
-          <div class="form-group {{trainingAlertType}}">
-            {{trainingMessage}} 
-          </div>
-        </form>
-        
-      </div>
-      <div class="col-md-7">
-        <canvas id="training-canvas">{{ trained_chart }}</canvas>
-      </div>
-  
-    </div>
-    <!-- /.row -->
-  
-    <hr>
-    <h5 class="my-1 siemens-text-color">Anomaly detection
-    </h5>
-  
-    <!-- Project Two -->
-    <div class="row">
-      <div class="col-md-5">
-          <form class="form-horizontal">
-              <div class="form-group">
-                <label for="exampleInputEmail1">Start time</label>
-                <input type="datetime-local" [(ngModel)]="anomalyStDt" class="form-control" name="anomalyStDt">
-              </div>
-              <div class="form-group">
-                <label for="exampleInputPassword1">End time</label>
-                <input type="datetime-local" [(ngModel)]="anomalyEndDt" class="form-control" name="anomalyEndDt">
-              </div>
-              <div class="form-group">
-                  <button type="button" (click)="detectAnomaly()" class="btn btn-info ">Detect Anomaly</button>
-                </div>
-                <div class="form-group {{anomalyAlertType}}">
-                  {{anomalyMessage}} 
-                </div>
-            </form>
-      </div>
-      <div class="col-md-7">
-        <canvas id="anomaly-canvas">{{ anomaly_chart }}</canvas>
-      </div>
-  
-    </div>
-    <!-- /.row -->
-  
-  
+  <div class="container">
+    <a class="navbar-brand" href="#">Anomaly detection</a>
   </div>
+</nav>
+
+<!-- Page Content -->
+<div class="container siemens-margin-top">
+
+  <h5 class="my-1 siemens-text-color">Asset Details : {{name}}</h5>
   <hr>
-  <!-- /.container -->
-  
-  <!-- Footer -->
-  <footer class="py-1 bg-dark">
-    <div class="container">
-      <p class="m-0 text-center text-white">Copyright &copy; Siemens 2018</p>
+  <!-- Page Heading -->
+  <h5 class="my-1 siemens-text-color">Training </h5>
+
+  <!-- Project One -->
+  <div class="row">
+    <div class="col-md-5">
+      <form class="form-horizontal">
+        
+        <div class="form-group">
+          <label for="exampleInputEmail1">Start time</label>
+          <input type="datetime-local" [(ngModel)]="assetStDt" class="form-control" name="assetStDt">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">End time</label>
+          <input type="datetime-local" [(ngModel)]="assetEndDt" class="form-control" name="assetEndDt">
+        </div>
+        <div class="form-group">
+            <input type="text" [(ngModel)]="epsilon" name="epsilon" class="form-control" placeholder="epsilon"> 
+          </div>
+          <div class="form-group">
+              <input type="text" [(ngModel)]="minPointsPrCluster" name="minPointsPrCluster" class="form-control" placeholder="min points per cluster"> 
+            </div>
+        <div class="form-group">
+          <button type="button" (click)="trainModel()" class="btn btn-info ml-1">Train Model</button>
+        </div>
+        <div class="form-group {{trainingAlertType}}">
+          {{trainingMessage}}
+        </div>
+      </form>
+
     </div>
-    <!-- /.container -->
-  </footer>
+    <div class="col-md-7">
+      <canvas id="training-canvas">{{ trained_chart }}</canvas>
+    </div>
+
+  </div>
+  <!-- /.row -->
+
+  <hr>
+  <h5 class="my-1 siemens-text-color">Anomaly detection
+  </h5>
+
+  <!-- Project Two -->
+  <div class="row">
+    <div class="col-md-5">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Start time</label>
+          <input type="datetime-local" [(ngModel)]="anomalyStDt" class="form-control" name="anomalyStDt">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">End time</label>
+          <input type="datetime-local" [(ngModel)]="anomalyEndDt" class="form-control" name="anomalyEndDt">
+        </div>
+        <div class="form-group">
+          <button type="button" (click)="detectAnomaly()" class="btn btn-info ">Detect Anomaly</button>
+        </div>
+        <div class="form-group {{anomalyAlertType}}">
+          {{anomalyMessage}}
+        </div>
+      </form>
+    </div>
+    <div class="col-md-7">
+      <canvas id="anomaly-canvas">{{ anomaly_chart }}</canvas>
+    </div>
+
+  </div>
+  <!-- /.row -->
+
+
+</div>
+<hr>
+<!-- /.container -->
+
+<!-- Footer -->
+<footer class="py-1 bg-dark">
+  <div class="container">
+    <p class="m-0 text-center text-white">Copyright &copy; Siemens 2018</p>
+  </div>
+  <!-- /.container -->
+</footer>

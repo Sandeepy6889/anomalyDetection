@@ -9,18 +9,18 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AnomalyService {
 
-  constructor(private http: HttpClient,private cookieService: CookieService) { }
-
-  trainModel(assetData) {
-     return this.http.post(
-      environment.baseUrl + '/api/anomalydetection/v3/models?epsilon=5&minPointsPerCluster=3&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
-      .pipe(map((response: any) => {return response;})); 
+  constructor(private http: HttpClient, private cookieService: CookieService) { }
+  
+  trainModel(assetData, epsilon, minPointsPrCluster) {
+    return this.http.post(
+      environment.baseUrl + '/api/anomalydetection/v3/models?epsilon=' + epsilon + '&minPointsPerCluster=' + minPointsPrCluster + '&_csrf=' + this.cookieService.get('XSRF-TOKEN'), assetData)
+      .pipe(map((response: any) => { return response; }));
   }
 
-  detectAnomaly(assetData,modelId){
+  detectAnomaly(assetData, modelId) {
     return this.http.post(
-      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID='+modelId+'&_csrf='+this.cookieService.get('XSRF-TOKEN'), assetData)
-      .pipe(map((response: any) => console.log(response))); 
+      environment.baseUrl + '/api/anomalydetection/v3/detectanomalies?modelID=' + modelId + '&_csrf=' + this.cookieService.get('XSRF-TOKEN'), assetData)
+      .pipe(map((response: any) => { return response; }));
   }
 
 }

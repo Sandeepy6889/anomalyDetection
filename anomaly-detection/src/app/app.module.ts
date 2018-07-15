@@ -4,8 +4,6 @@ import { CookieService } from 'ngx-cookie-service';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
-import { UserComponent } from './components/user/user.component';
-import { MindsdkService } from './services/mindsdk.service';
 import { AnomalyDetectionComponent } from './components/anomaly-detection/anomaly-detection.component';
 import { AssetService } from './services/asset.service';
 import { AnomalyService } from './services/anomaly.service';
@@ -14,7 +12,6 @@ import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
-    UserComponent,
     AnomalyDetectionComponent 
   ],
   imports: [
@@ -22,7 +19,7 @@ import { FormsModule } from '@angular/forms';
     HttpClientModule,
     FormsModule     
   ],
-  providers: [MindsdkService, CookieService, AssetService, AnomalyService ],
+  providers: [CookieService, AssetService, AnomalyService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
