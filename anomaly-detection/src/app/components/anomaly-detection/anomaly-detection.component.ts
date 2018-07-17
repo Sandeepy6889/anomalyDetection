@@ -23,6 +23,7 @@ export class AnomalyDetectionComponent implements OnInit {
   private trained_voltage_data = [];
   private trained_current_data = [];
   private _time = [];
+  private anomalyTime=[];
   public trainingAlertType = "";
   public trainingMessage = "";
   public anomalyAlertType = "";
@@ -36,7 +37,7 @@ export class AnomalyDetectionComponent implements OnInit {
   constructor(private _assetService: AssetService, private anomalyService: AnomalyService) { }
 
   ngOnInit() {
-    // this.setAssetName();
+    this.setAssetName();
     this.plotGraph('training-canvas', "training");
     this.plotGraph('anomaly-canvas', "anomaly");
   }
@@ -49,15 +50,17 @@ export class AnomalyDetectionComponent implements OnInit {
 
   trainModel() {
     this.clearTrainingMessages();
+    this.clearChartAttributes();
+    this.plotGraph('training-canvas', "training");
     this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(assetData => {
+      console.log("Total asset data", assetData.length);
       if (assetData.length > 0) {
         this.anomalyService.trainModel(assetData, this.epsilon, this.minPointsPrCluster).subscribe(response => {
           this.modelId = response.id;
           this.trainingMessage = "Model trained successfully";
           this.trainingAlertType = "alert alert-success";
         }, error => {
-          console.log("Error occured when training the model", error);
-          this.trainingMessage = "Error occured, please check console logs";
+          this.trainingMessage = "Error occured while training the model. Please try again";
           this.trainingAlertType = "alert alert-danger";
         });
       }
@@ -76,28 +79,35 @@ export class AnomalyDetectionComponent implements OnInit {
       }
       this.plotGraph('training-canvas', "training");
     }, error => {
-      console.log("Error occured while fetching asset data", error);
-      this.trainingMessage = "Error occured, please check console logs";
+      this.trainingMessage = "Error occured while fetching asset data. Please try again";
       this.trainingAlertType = "alert alert-danger";
     });
   }
 
   detectAnomaly() {
     this.clearAnomalyMessages();
+    this.clearChartAttributes();
+    this.plotGraph('anomaly-canvas', "anomaly");
     this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(assetData => {
+      
       if (assetData.length > 0) {
+        console.log("Total asset data", assetData.length);
         this.anomalyService.detectAnomaly(assetData, this.modelId).subscribe(anomalyData => {
-          this.clearChartAttributes();
+          console.log("No of anomalies", anomalyData.length);
           let anomalyIndex = 0;
           for (let index = 0; index < assetData.length; index++) {
             this.trained_voltage_data.push(assetData[index].Voltage);
             this.trained_current_data.push(assetData[index].Current);
             this._time.push(assetData[index]._time);
+            
+            console.log('time ', assetData[index]._time);
             if (anomalyData.length > anomalyIndex && assetData[index]._time === anomalyData[anomalyIndex]._time) {
               this.voltageBackgroundColor.push("red");
               this.currentBackgroundColor.push("red");
               this.pointRadius.push(4);
+              this.anomalyTime.push(anomalyData[anomalyIndex]._time);
               anomalyIndex = anomalyIndex + 1;
+              
             }
             else {
               this.voltageBackgroundColor.push('#20B2AA');
@@ -106,18 +116,16 @@ export class AnomalyDetectionComponent implements OnInit {
             }
           }
           this.plotGraph('anomaly-canvas', "anomaly");
-        }, error => {
-          console.log("Error occured in detect anomaly process", error);
-          this.anomalyMessage = "Error occured, please check console logs";
+         }, error => {
+          this.anomalyMessage = "Error occured while detecting anomaly in data. Please try again";
           this.anomalyAlertType = "alert alert-danger";
         });
       } else {
         this.anomalyMessage = "No data available for given duration";
         this.anomalyAlertType = "alert alert-danger";
       }
-    }, error => {
-      console.log("Error occured when getting asset data", error);
-      this.anomalyMessage = "Error occured, please check console logs";
+    }, error => {console.log("Error occured while fetching asset data", error);
+      this.anomalyMessage = "Error occured while fetching asset data. Please try again";
       this.anomalyAlertType = "alert alert-danger";
     });
   }
@@ -135,6 +143,7 @@ export class AnomalyDetectionComponent implements OnInit {
   }
 
   plotGraph(chartID: string, chartName: string) {
+    var toottipData = this.anomalyTime;
     let info = {
       type: 'line',
       data: {
@@ -163,6 +172,18 @@ export class AnomalyDetectionComponent implements OnInit {
         ]
       },
       options: {
+        tooltips: {
+          callbacks: {
+              beforeTitle: function(tooltipItems, data) {
+                for(let i=0;i<toottipData.length;i++)
+                {
+                  if(tooltipItems[0].xLabel.includes(toottipData[i]))
+                     return "Anamoly ";  
+                }
+               return "";
+            }
+          }
+        }, 
         elements: {
           line: {
             tension: 0.01
@@ -220,5 +241,6 @@ export class AnomalyDetectionComponent implements OnInit {
     this.voltageBackgroundColor = [];
     this.currentBackgroundColor = [];
     this.pointRadius = [];
+    this.anomalyTime = [];
   }
 }

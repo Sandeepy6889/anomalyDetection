@@ -13,13 +13,13 @@ export class AssetService {
   getAssetData(startTime, endTime) {
     let queryString = "from=" + startTime + "&to=" + endTime;
     return this.http.get(
-      environment.baseUrl + '/api/iottimeseries/v3/timeseries/3cc1e87c3d794e3caf5d018f06646fbd/power?' + queryString)
+      environment.baseUrl + '/api/iottimeseries/v3/timeseries/2dc4bd68f06b44e5bdc7523734e78651/AnomalyAspect?' + queryString)
       .pipe(map((response: any) => response));
   }
 
   getAssetInfo() {
     return this.http.get(
-      environment.baseUrl + '/api/assetmanagement/v3/assets/3cc1e87c3d794e3caf5d018f06646fbd')
+      environment.baseUrl + '/api/assetmanagement/v3/assets/2dc4bd68f06b44e5bdc7523734e78651')
       .pipe(map((response: any) => response));
   }
 }
