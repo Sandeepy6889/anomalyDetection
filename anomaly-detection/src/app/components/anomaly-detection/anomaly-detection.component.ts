@@ -99,15 +99,12 @@ export class AnomalyDetectionComponent implements OnInit {
             this.trained_voltage_data.push(assetData[index].Voltage);
             this.trained_current_data.push(assetData[index].Current);
             this._time.push(assetData[index]._time);
-            
-            console.log('time ', assetData[index]._time);
             if (anomalyData.length > anomalyIndex && assetData[index]._time === anomalyData[anomalyIndex]._time) {
               this.voltageBackgroundColor.push("red");
               this.currentBackgroundColor.push("red");
               this.pointRadius.push(4);
               this.anomalyTime.push(anomalyData[anomalyIndex]._time);
               anomalyIndex = anomalyIndex + 1;
-              
             }
             else {
               this.voltageBackgroundColor.push('#20B2AA');
@@ -124,7 +121,7 @@ export class AnomalyDetectionComponent implements OnInit {
         this.anomalyMessage = "No data available for given duration";
         this.anomalyAlertType = "alert alert-danger";
       }
-    }, error => {console.log("Error occured while fetching asset data", error);
+    }, error => {
       this.anomalyMessage = "Error occured while fetching asset data. Please try again";
       this.anomalyAlertType = "alert alert-danger";
     });
