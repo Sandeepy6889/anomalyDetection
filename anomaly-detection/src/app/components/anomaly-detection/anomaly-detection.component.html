@@ -5,7 +5,7 @@
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active">
-           <img class="img-fluid rounded mb-3 mb-md-0" src="assets/siemens.png" alt="Siemens">
+          <img class="img-fluid rounded mb-3 mb-md-0" src="assets/siemens.png" alt="Siemens">
         </li>
       </ul>
     </div>
@@ -16,11 +16,12 @@
 <div class="container siemens-margin-top">
 
   <h5 class="my-1 siemens-text-color">Asset Details : {{name}}</h5>
-  <hr>
+
   <!-- Page Heading -->
+
+  <hr>
   <h5 class="my-1 siemens-text-color">Training </h5>
 
-  <!-- Project One -->
   <div class="row">
     <div class="col-md-5">
       <form class="form-horizontal">
@@ -41,15 +42,16 @@
         </div>
         <div class="form-group">
           <button type="button" (click)="trainModel()" class="btn btn-info ml-1">Train Model</button>
+          <button type="button" [disabled]="!trainZoomEnbl" (click)="resetTrainingZoom()" class="btn btn-info float-right">Reset Zoom</button>
         </div>
         <div class="form-group {{trainingAlertType}}">
           {{trainingMessage}}
         </div>
       </form>
-
     </div>
-    <div class="col-md-7">
-      <canvas id="training-canvas">{{ trained_chart }}</canvas>
+
+    <div class="col-md-7 img-fluid rounded mb-3 mb-md-0" style="display: inline;background-color: #f7f7f7">
+      <canvas #trainingCanvas>{{ trained_chart }}</canvas>
     </div>
 
   </div>
@@ -73,14 +75,15 @@
         </div>
         <div class="form-group">
           <button type="button" (click)="detectAnomaly()" class="btn btn-info ">Detect Anomaly</button>
+          <button type="button" [disabled]="!detectZoomEnbl" (click)="resetAnomalyZoom()" class="btn btn-info float-right">Reset Zoom</button>
         </div>
         <div class="form-group {{anomalyAlertType}}">
           {{anomalyMessage}}
         </div>
       </form>
     </div>
-    <div class="col-md-7">
-      <canvas id="anomaly-canvas">{{ anomaly_chart }}</canvas>
+    <div class="col-md-7" style="background-color: #f7f7f7">
+      <canvas #anomalyCanvas>{{ anomaly_chart }}</canvas>
     </div>
 
   </div>

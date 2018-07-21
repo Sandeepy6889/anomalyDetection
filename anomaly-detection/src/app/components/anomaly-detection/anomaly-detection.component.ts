@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AssetService } from '../../services/asset.service';
 import { AnomalyService } from '../../services/anomaly.service';
 import { DatePipe } from '@angular/common';
 import { Chart } from 'chart.js';
-import { HttpResponse } from '@angular/common/http';
 import * as moment from 'moment';
+
 
 @Component({
   selector: 'app-anomaly-detection',
@@ -23,7 +23,7 @@ export class AnomalyDetectionComponent implements OnInit {
   private trained_voltage_data = [];
   private trained_current_data = [];
   private _time = [];
-  private anomalyTime=[];
+  private anomalyTime = [];
   public trainingAlertType = "";
   public trainingMessage = "";
   public anomalyAlertType = "";
@@ -33,14 +33,25 @@ export class AnomalyDetectionComponent implements OnInit {
   private voltageBackgroundColor = [];
   private currentBackgroundColor = [];
   private pointRadius = [];
+  public trainZoomEnbl = false;
+  public detectZoomEnbl = false;
+
+  @ViewChild('trainingCanvas') trainingCanvas: ElementRef;
+  public trainingContext: CanvasRenderingContext2D;
+  @ViewChild('anomalyCanvas') anomalyCanvas: ElementRef;
+  public anomalyContext: CanvasRenderingContext2D;
 
   constructor(private _assetService: AssetService, private anomalyService: AnomalyService) { }
 
   ngOnInit() {
-    this.setAssetName();
-    this.plotGraph('training-canvas', "training");
-    this.plotGraph('anomaly-canvas', "anomaly");
+     this.setAssetName();
   }
+
+  ngAfterViewInit(): void {
+    this.trainingContext = (<HTMLCanvasElement>this.trainingCanvas.nativeElement).getContext('2d');
+    this.anomalyContext = (<HTMLCanvasElement>this.anomalyCanvas.nativeElement).getContext('2d');
+  }
+
 
   setAssetName() {
     this._assetService.getAssetInfo().subscribe(response => {
@@ -49,12 +60,14 @@ export class AnomalyDetectionComponent implements OnInit {
   }
 
   trainModel() {
+    this.trainZoomEnbl = false;
     this.clearTrainingMessages();
     this.clearChartAttributes();
-    this.plotGraph('training-canvas', "training");
+    this.plotGraph("training");
     this._assetService.getAssetData(this.dateFormat(this.assetStDt), this.dateFormat(this.assetEndDt)).subscribe(assetData => {
       console.log("Total asset data", assetData.length);
       if (assetData.length > 0) {
+        this.trainZoomEnbl = true;
         this.anomalyService.trainModel(assetData, this.epsilon, this.minPointsPrCluster).subscribe(response => {
           this.modelId = response.id;
           this.trainingMessage = "Model trained successfully";
@@ -77,20 +90,29 @@ export class AnomalyDetectionComponent implements OnInit {
         this.currentBackgroundColor.push('#78866b');
         this.pointRadius.push(1.5);
       }
-      this.plotGraph('training-canvas', "training");
+      this.plotGraph("training");
     }, error => {
       this.trainingMessage = "Error occured while fetching asset data. Please try again";
       this.trainingAlertType = "alert alert-danger";
     });
   }
 
+  resetTrainingZoom(){
+    this.trained_chart.resetZoom();
+  }
+
+  resetAnomalyZoom(){
+    this.anomaly_chart.resetZoom();
+  }
+
   detectAnomaly() {
     this.clearAnomalyMessages();
     this.clearChartAttributes();
-    this.plotGraph('anomaly-canvas', "anomaly");
+    this.plotGraph("anomaly");
+    this.detectZoomEnbl = false;
     this._assetService.getAssetData(this.dateFormat(this.anomalyStDt), this.dateFormat(this.anomalyEndDt)).subscribe(assetData => {
-      
       if (assetData.length > 0) {
+        this.detectZoomEnbl = true;
         console.log("Total asset data", assetData.length);
         this.anomalyService.detectAnomaly(assetData, this.modelId).subscribe(anomalyData => {
           console.log("No of anomalies", anomalyData.length);
@@ -112,8 +134,8 @@ export class AnomalyDetectionComponent implements OnInit {
               this.pointRadius.push(1.5);
             }
           }
-          this.plotGraph('anomaly-canvas', "anomaly");
-         }, error => {
+          this.plotGraph("anomaly");
+        }, error => {
           this.anomalyMessage = "Error occured while detecting anomaly in data. Please try again";
           this.anomalyAlertType = "alert alert-danger";
         });
@@ -139,7 +161,7 @@ export class AnomalyDetectionComponent implements OnInit {
     return moment(date).format();
   }
 
-  plotGraph(chartID: string, chartName: string) {
+  plotGraph(chartName: string) {
     var toottipData = this.anomalyTime;
     let info = {
       type: 'line',
@@ -171,16 +193,15 @@ export class AnomalyDetectionComponent implements OnInit {
       options: {
         tooltips: {
           callbacks: {
-              beforeTitle: function(tooltipItems, data) {
-                for(let i=0;i<toottipData.length;i++)
-                {
-                  if(tooltipItems[0].xLabel.includes(toottipData[i]))
-                     return "Anamoly ";  
-                }
-               return "";
+            beforeTitle: function (tooltipItems, data) {
+              for (let i = 0; i < toottipData.length; i++) {
+                if (tooltipItems[0].xLabel.includes(toottipData[i]))
+                  return "Anamoly ";
+              }
+              return "";
             }
           }
-        }, 
+        },
         elements: {
           line: {
             tension: 0.01
@@ -206,18 +227,32 @@ export class AnomalyDetectionComponent implements OnInit {
             }
           }],
         },
-
+        pan: {
+          enabled: true,
+          mode: "xy",
+          speed: 10,
+          threshold: 10
+        },
+        zoom: {
+          enabled: true,
+          drag: false,
+          mode: "xy",
+          limits: {
+            max: 10,
+            min: 0.5
+          }
+        }
       }
     };
     if (chartName === "training") {
       if (this.trained_chart)
         this.trained_chart.destroy();
-      this.trained_chart = new Chart(chartID, info);
+      this.trained_chart = new Chart(this.trainingContext, info);
     }
     else {
       if (this.anomaly_chart)
         this.anomaly_chart.destroy();
-      this.anomaly_chart = new Chart(chartID, info);
+      this.anomaly_chart = new Chart(this.anomalyContext, info);
     }
   }
 
